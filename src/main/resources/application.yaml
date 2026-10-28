@@ -1,3 +1,9 @@
+binance:
+  api:
+    url: https://api.binance.com/api/v3/
+  poll-interval: ${BINANCE_POLL_INTERVAL:PT30S}
+  symbol: ${BINANCE_REQUESTED_SYMBOL}
+
 spring:
   application:
     name: currency-service
@@ -18,3 +24,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  task:
+    scheduling:
+      pool:
+        size: 1
