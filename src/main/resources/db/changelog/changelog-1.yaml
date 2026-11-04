@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: create-prices-table
-      author: your_name
+      author: Egrius
       changes:
         - sqlFile:
             path: sql/changelog-1.sql

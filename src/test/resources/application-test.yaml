@@ -1,0 +1,38 @@
+logging:
+  level:
+    by.Egrius.currency_service.service.PriceService: DEBUG
+    by.Egrius.currency_service.service.BinanceScheduler: DEBUG
+
+binance:
+  api:
+    url: https://api.binance.com/api/v3/
+  poll-interval: ${BINANCE_POLL_INTERVAL:PT30S}
+  symbol: ${BINANCE_REQUESTED_SYMBOL:BNBUSDT}
+  trend:
+    threshold: 0.01
+
+spring:
+  application:
+    name: currency-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:currency_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  task:
+    scheduling:
+      pool:
+        size: 1

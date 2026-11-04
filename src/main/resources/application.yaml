@@ -1,8 +1,15 @@
+logging:
+  level:
+    by.Egrius.currency_service.service.PriceService: INFO
+    by.Egrius.currency_service.service.BinanceScheduler: INFO
+
 binance:
   api:
     url: https://api.binance.com/api/v3/
   poll-interval: ${BINANCE_POLL_INTERVAL:PT30S}
-  symbol: ${BINANCE_REQUESTED_SYMBOL}
+  symbol: ${BINANCE_REQUESTED_SYMBOL:BNBUSDT}
+  trend:
+    threshold: 0.01
 
 spring:
   application:

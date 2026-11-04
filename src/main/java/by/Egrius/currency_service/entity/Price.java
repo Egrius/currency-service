@@ -48,4 +48,14 @@ public class Price {
     public int hashCode() {
         return Objects.hash(symbol, fetchedAt);
     }
+
+    @Override
+    public String toString() {
+        return "Price{" +
+                "id=" + id +
+                ", symbol='" + symbol + '\'' +
+                ", price=" + price +
+                ", fetchedAt=" + fetchedAt +
+                '}';
+    }
 }

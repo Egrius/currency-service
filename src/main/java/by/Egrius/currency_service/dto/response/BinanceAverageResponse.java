@@ -2,8 +2,8 @@ package by.Egrius.currency_service.dto.response;
 
 import java.math.BigDecimal;
 
-public record BinanceAverageResponseDTO(
+public record BinanceAverageResponse(
         int mins,
         BigDecimal price,
-        int lastTrade
+        long closeTime
 ) { }
