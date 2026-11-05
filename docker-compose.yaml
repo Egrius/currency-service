@@ -1,19 +1,49 @@
 services:
   db:
-    image: postgres:latest
+    image: postgres:16-alpine
 
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
     networks:
       - localnet
 
     environment:
-      POSTGRES_PASSWORD: ${DB_USER}
-      POSTGRES_USER: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
 
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+
+  app:
+    depends_on:
+      - db
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - localnet
+
+    environment:
+      BINANCE_POLL_INTERVAL: ${BINANCE_POLL_INTERVAL}
+      BINANCE_INITIAL_DELAY: ${BINANCE_INITIAL_DELAY}
+      BINANCE_REQUESTED_SYMBOL: ${BINANCE_REQUESTED_SYMBOL}
+
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
 
 networks:
   localnet:
     driver: bridge
+
+volumes:
+  db_volume:

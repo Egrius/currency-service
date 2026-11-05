@@ -11,7 +11,7 @@ import by.Egrius.currency_service.exception.DateParametersMismatchException;
 import by.Egrius.currency_service.exception.PriceNotFoundException;
 import by.Egrius.currency_service.mapper.PriceReadMapper;
 import by.Egrius.currency_service.repository.PriceRepository;
-import by.Egrius.currency_service.repository.projection.TrendProjection;
+import by.Egrius.currency_service.repository.projection.TrendBucketProjection;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +48,8 @@ public class PriceService {
 
     private final PriceRepository priceRepository;
     private final PriceReadMapper priceReadMapper;
+
+
 
     @PostConstruct
     void init() {
@@ -137,11 +139,11 @@ public class PriceService {
 
         log.debug("Calculating trend from={} to={} using bucketsCount={}", from, to, bucketsCount);
 
-        List<TrendProjection> buckets = priceRepository.findTrendByRange(from, to, bucketsCount);
+        List<TrendBucketProjection> buckets = priceRepository.findTrendByRange(from, to, bucketsCount);
 
         if(buckets.size() == 1) {
 
-            TrendProjection singleBucket = buckets.getFirst();
+            TrendBucketProjection singleBucket = buckets.getFirst();
             Instant minTime = singleBucket.getMinFetchedAt();
             Instant maxTime = singleBucket.getMaxFetchedAt();
 
@@ -161,10 +163,13 @@ public class PriceService {
         return new TrendResponse(requestedSymbol, from, to, trend);
     }
 
-    private Trend calculateTrend(List<TrendProjection> trendData) {
+    private Trend calculateTrend(List<TrendBucketProjection> buckets) {
         /*
         Пришли корзины: максимальное количество их может быть bucketsCount + 1 (специфика функции)
         Upd: теперь без +1, исправил путём добавления 0.001 к верхней границе
+        Upd 2.0: +1 исправил через LEAST() SQL-функцию, добавление 0.001 приводило к ошибкам взятия среднего,
+        т.к смещало все бакеты, а задача была защититься от создания доп бакета, если время записи точь-в-точь
+        как правая граница
 
         в пустых корзинах данных нет - не попали в определенный пустой корзиной промежуток => они не ориентир.
         заполненные - представляют собой среднее по интервалам.
@@ -174,10 +179,10 @@ public class PriceService {
         Т.е. определить какой процент от начального составляет разница
          */
 
-        if(trendData.isEmpty()) return Trend.FLAT;
+        if(buckets.isEmpty()) return Trend.FLAT;
 
-        BigDecimal first = trendData.getFirst().getAveragePrice();
-        BigDecimal last = trendData.getLast().getAveragePrice();
+        BigDecimal first = buckets.getFirst().getAveragePrice();
+        BigDecimal last = buckets.getLast().getAveragePrice();
 
         // Нестандартная ситуация, когда < 0, оставил на подстраховку
         if (first.compareTo(BigDecimal.ZERO) <= 0) {
@@ -190,7 +195,7 @@ public class PriceService {
 
         BigDecimal diffPercentage = diff.abs()
                 .multiply(BigDecimal.valueOf(100L))
-                .divide(first, 2, RoundingMode.HALF_UP);
+                .divide(first, 5, RoundingMode.HALF_UP);
         /*
         после процента понять, больше он или меньше трешолда, после - направление
          */

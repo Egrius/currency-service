@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -18,7 +17,6 @@ import java.time.Instant;
 @RestController
 @RequestMapping("/api/v1/prices")
 @RequiredArgsConstructor
-@Validated
 public class ApiController {
 
     private final PriceService priceService;
@@ -53,7 +51,7 @@ public class ApiController {
                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                                                     Instant to,
 
-                                                    @RequestParam(value = "page")
+                                                    @RequestParam(value = "page", defaultValue = "0")
                                                     @Min(value = 0, message = "You can't provide param 'page' with a value less than '0'")
                                                     Integer page,
 

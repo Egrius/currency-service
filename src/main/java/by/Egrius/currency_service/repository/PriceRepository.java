@@ -1,7 +1,7 @@
 package by.Egrius.currency_service.repository;
 
 import by.Egrius.currency_service.entity.Price;
-import by.Egrius.currency_service.repository.projection.TrendProjection;
+import by.Egrius.currency_service.repository.projection.TrendBucketProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,18 +41,21 @@ public interface PriceRepository extends JpaRepository<Price, Long> {
                 AVG(price) as averagePrice,
                 MIN(fetched_at) as minFetchedAt,
                 MAX(fetched_at) as maxFetchedAt,
-                WIDTH_BUCKET(
-                     EXTRACT(EPOCH FROM fetched_at),
-                     EXTRACT(EPOCH FROM CAST( :from AS TIMESTAMPTZ)),
-                     EXTRACT(EPOCH FROM CAST( :to AS TIMESTAMPTZ))  + 0.001,
-                     :bucketsCount
+                LEAST(
+                        WIDTH_BUCKET(
+                        EXTRACT(EPOCH FROM fetched_at),
+                        EXTRACT(EPOCH FROM CAST( :from AS TIMESTAMPTZ)),
+                        EXTRACT(EPOCH FROM CAST( :to AS TIMESTAMPTZ)),
+                        :bucketsCount
+                                    
+                    ), :bucketsCount
                 ) as bucketNumber
             FROM prices
             WHERE fetched_at >= :from AND fetched_at <= :to
             GROUP BY symbol, bucketNumber
             ORDER BY bucketNumber ASC
             """, nativeQuery = true)
-    List<TrendProjection> findTrendByRange(@Param("from") Instant from,
-                                           @Param("to") Instant to,
-                                           @Param("bucketsCount") int bucketsCount);
+    List<TrendBucketProjection> findTrendByRange(@Param("from") Instant from,
+                                                 @Param("to") Instant to,
+                                                 @Param("bucketsCount") int bucketsCount);
 }

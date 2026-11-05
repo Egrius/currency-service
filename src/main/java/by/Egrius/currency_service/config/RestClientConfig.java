@@ -13,7 +13,7 @@ import java.time.Duration;
 public class RestClientConfig {
 
     @Value("${binance.api.url}")
-    private String binanceApiUrl;
+    private String binanceBaseUrl;
 
     @Bean
     public RestClient restClient(RestClient.Builder builder) {
@@ -22,7 +22,7 @@ public class RestClientConfig {
                 .withReadTimeout(Duration.ofSeconds(5));
 
         return builder
-                .baseUrl(binanceApiUrl)
+                .baseUrl(binanceBaseUrl)
                 .requestFactory(ClientHttpRequestFactoryBuilder.detect().build(settings))
                 .build();
     }

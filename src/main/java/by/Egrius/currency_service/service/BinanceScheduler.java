@@ -21,6 +21,9 @@ public class BinanceScheduler {
     @Value("${binance.symbol}")
     private String requestedSymbol;
 
+    @Value("${binance.api.avg-price-url}")
+    private String avgPriceEndpointUrl;
+
     private static final long DEFAULT_BACKOFF_SECONDS = 60L;
 
     private final RestClient restClient;
@@ -29,8 +32,10 @@ public class BinanceScheduler {
 
     private volatile Instant backOffUntil = Instant.MIN;
 
-    @Scheduled(fixedRateString = "${binance.poll-interval}")
-
+    @Scheduled(
+            fixedRateString = "${binance.poll-interval}",
+            initialDelayString = "${binance.initial-delay}"
+    )
     public void requestAvgPriceFromApi() {
         // Делает запрос каждые poll-interval
         // Сохраняет в БД полученные записи
@@ -46,12 +51,12 @@ public class BinanceScheduler {
 
         try {
 
-            log.info("Fetching /avgPrice");
+            log.info("Fetching {}", avgPriceEndpointUrl);
 
             BinanceAverageResponse binanceResponse = restClient.get()
                     .uri(uri ->
                             uri
-                                    .path("/avgPrice")
+                                    .path(avgPriceEndpointUrl)
                                     .queryParam("symbol", requestedSymbol)
                                     .build()
                     )

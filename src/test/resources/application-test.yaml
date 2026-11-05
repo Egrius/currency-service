@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 logging:
   level:
     by.Egrius.currency_service.service.PriceService: DEBUG
@@ -5,8 +8,10 @@ logging:
 
 binance:
   api:
-    url: https://api.binance.com/api/v3/
+    url: https://api.binance.com
+    avg-price-url: /api/v3/avgPrice
   poll-interval: ${BINANCE_POLL_INTERVAL:PT30S}
+  initial-delay: ${BINANCE_INITIAL_DELAY:PT0S}
   symbol: ${BINANCE_REQUESTED_SYMBOL:BNBUSDT}
   trend:
     threshold: 0.01
@@ -15,12 +20,12 @@ spring:
   application:
     name: currency-service
 
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:currency_db}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
+#  datasource:
+#    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:currency_db}
+#    username: ${DB_USER:postgres}
+#    password: ${DB_PASSWORD:postgres}
 
-    driver-class-name: org.postgresql.Driver
+#    driver-class-name: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

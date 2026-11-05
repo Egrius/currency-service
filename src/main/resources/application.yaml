@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 logging:
   level:
     by.Egrius.currency_service.service.PriceService: INFO
@@ -5,8 +8,10 @@ logging:
 
 binance:
   api:
-    url: https://api.binance.com/api/v3/
+    url: https://api.binance.com
+    avg-price-url: /api/v3/avgPrice
   poll-interval: ${BINANCE_POLL_INTERVAL:PT30S}
+  initial-delay: ${BINANCE_INITIAL_DELAY:0}
   symbol: ${BINANCE_REQUESTED_SYMBOL:BNBUSDT}
   trend:
     threshold: 0.01

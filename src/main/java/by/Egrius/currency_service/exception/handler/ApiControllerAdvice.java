@@ -1,5 +1,6 @@
 package by.Egrius.currency_service.exception.handler;
 
+import by.Egrius.currency_service.controller.ApiController;
 import by.Egrius.currency_service.dto.response.ErrorResponse;
 import by.Egrius.currency_service.exception.DateParametersMismatchException;
 import by.Egrius.currency_service.exception.PriceNotFoundException;
@@ -16,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice(assignableTypes = ApiControllerAdvice.class)
+@RestControllerAdvice(assignableTypes = ApiController.class)
 public class ApiControllerAdvice {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleDateParametersMismatchException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
         List<ErrorResponse.ErrorDto> errors = e.getBindingResult().getFieldErrors()
                 .stream()
@@ -33,7 +34,7 @@ public class ApiControllerAdvice {
     }
 
     @ExceptionHandler(value = HandlerMethodValidationException.class)
-    public ResponseEntity<ErrorResponse> handleDateParametersMismatchException(HandlerMethodValidationException e) {
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
 
         List<ErrorResponse.ErrorDto> errors = new ArrayList<>();
 
@@ -63,7 +64,7 @@ public class ApiControllerAdvice {
     }
 
     @ExceptionHandler(value = PriceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleDateParametersMismatchException(PriceNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handlePriceNotFoundException(PriceNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(404))
                 .body(new ErrorResponse(e.getMessage(), List.of()));
