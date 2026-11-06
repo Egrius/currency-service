@@ -113,7 +113,7 @@ class ApiControllerSliceTests {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/prices ")
+    @DisplayName("GET /api/v1/prices")
     class GetPagingPricesByRangeTests {
 
         @Test
